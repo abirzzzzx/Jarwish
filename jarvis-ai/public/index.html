@@ -7,6 +7,9 @@
     <meta name="description" content="JARVIS AI Assistant - Your futuristic personal AI">
     <title>JARVIS AI Assistant</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Loading Screen -->
@@ -55,14 +58,6 @@
 
         <!-- Input Controls -->
         <div class="input-controls">
-            <!-- Quick Actions -->
-            <div class="quick-actions" id="quick-actions">
-                <button class="quick-action-btn" data-action="explain">Explain</button>
-                <button class="quick-action-btn" data-action="code">Code</button>
-                <button class="quick-action-btn" data-action="summarize">Summarize</button>
-                <button class="quick-action-btn" data-action="recommend">Recommend</button>
-            </div>
-
             <!-- Input Bar -->
             <div class="input-bar">
                 <button id="mic-btn" class="mic-btn" aria-label="Voice input">
@@ -92,6 +87,19 @@
                     </svg>
                 </button>
             </div>
+            
+            <!-- Terminal Panel (hidden by default) -->
+            <div id="terminal-panel" class="terminal-panel hidden">
+                <div class="terminal-header">
+                    <span class="terminal-title">TERMINAL</span>
+                    <button id="terminal-close" class="terminal-close">&times;</button>
+                </div>
+                <div id="terminal-output" class="terminal-output"></div>
+                <div class="terminal-input-line">
+                    <span class="terminal-prompt">$</span>
+                    <input type="text" id="terminal-input" placeholder="Enter command..." autocomplete="off">
+                </div>
+            </div>
         </div>
 
         <!-- Settings Panel -->
@@ -114,7 +122,8 @@
                     <div class="setting-item">
                         <label for="model-select">Model</label>
                         <select id="model-select">
-                            <option value="google/gemma-3-27b-it:free" selected>Gemma 3 27B (Free)</option>
+                            <option value="nvidia/nemotron-3-ultra-550b-a55b:free" selected>Nemotron 3 Ultra (Free)</option>
+                            <option value="google/gemma-3-27b-it:free">Gemma 3 27B (Free)</option>
                             <option value="google/gemma-2-9b-it:free">Gemma 2 9B (Free)</option>
                             <option value="meta-llama/llama-3-8b-instruct:free">Llama 3 8B (Free)</option>
                         </select>

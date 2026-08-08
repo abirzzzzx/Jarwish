@@ -81,10 +81,10 @@ class JarvisSphere {
     }
     
     createSphere() {
-        // Main sphere geometry
-        const geometry = new THREE.IcosahedronGeometry(1, 4);
+        // Main sphere geometry - higher detail for smoother appearance
+        const geometry = new THREE.IcosahedronGeometry(1, 6);
         
-        // Create a custom shader material for the sphere
+        // Create a custom shader material for the sphere with advanced effects
         const material = new THREE.ShaderMaterial({
             uniforms: {
                 time: { value: 0 },
@@ -101,8 +101,10 @@ class JarvisSphere {
                     vNormal = normalize(normalMatrix * normal);
                     vPosition = position;
                     
-                    // Subtle vertex displacement
-                    vec3 newPosition = position + normal * sin(time * 2.0 + position.y * 3.0) * 0.02;
+                    // Smooth wave displacement
+                    float displacement = sin(time * 1.5 + position.y * 2.0) * 0.015;
+                    displacement += cos(time * 0.8 + position.x * 1.5) * 0.01;
+                    vec3 newPosition = position + normal * displacement;
                     
                     gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
                 }
@@ -116,12 +118,16 @@ class JarvisSphere {
                 uniform float intensity;
                 
                 void main() {
-                    float fresnel = dot(vNormal, vec3(0.0, 0.0, 1.0));
+                    // Advanced fresnel effect
+                    vec3 viewDirection = normalize(vec3(0.0, 0.0, 1.0));
+                    float fresnel = dot(vNormal, viewDirection);
                     fresnel = clamp(1.0 - fresnel, 0.0, 1.0);
-                    fresnel = pow(fresnel, 2.0);
+                    fresnel = pow(fresnel, 1.5);
                     
-                    vec3 finalColor = mix(color, glowColor, fresnel * 0.5);
-                    float alpha = 0.3 + fresnel * intensity;
+                    // Animated color shift
+                    vec3 animatedColor = mix(color, glowColor, sin(time * 0.5) * 0.2 + 0.5);
+                    vec3 finalColor = mix(animatedColor, glowColor, fresnel * 0.6);
+                    float alpha = 0.25 + fresnel * intensity;
                     
                     gl_FragColor = vec4(finalColor, alpha);
                 }
@@ -135,19 +141,22 @@ class JarvisSphere {
         this.sphere = new THREE.Mesh(geometry, material);
         this.scene.add(this.sphere);
         
-        // Outer glass layer
-        const glassGeometry = new THREE.IcosahedronGeometry(1.15, 3);
-        const glassMaterial = new THREE.MeshPhongMaterial({
-            color: 0x00d4ff,
-            transparent: true,
-            opacity: 0.1,
-            shininess: 100,
-            specular: 0x00d4ff,
-            side: THREE.DoubleSide
-        });
-        
-        const glassSphere = new THREE.Mesh(glassGeometry, glassMaterial);
-        this.sphere.add(glassSphere);
+        // Multiple glass layers for depth
+        for (let i = 0; i < 3; i++) {
+            const glassGeometry = new THREE.IcosahedronGeometry(1.15 + i * 0.1, 4);
+            const glassMaterial = new THREE.MeshPhongMaterial({
+                color: i === 0 ? 0x00d4ff : 0x0099cc,
+                transparent: true,
+                opacity: 0.08 - i * 0.02,
+                shininess: 100,
+                specular: 0x00d4ff,
+                side: THREE.DoubleSide
+            });
+            
+            const glassSphere = new THREE.Mesh(glassGeometry, glassMaterial);
+            glassSphere.rotation.x = i * 0.3;
+            this.sphere.add(glassSphere);
+        }
     }
     
     createParticles() {
