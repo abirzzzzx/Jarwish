@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="description" content="JARVIS AI Assistant - Your futuristic personal AI">
+    <title>JARVIS AI Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2>INITIALIZING JARVIS</h2>
+            <p id="loading-status">Loading core systems...</p>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div id="app-container" class="app-container hidden">
+        <!-- 3D Sphere Container -->
+        <div id="sphere-container" class="sphere-container">
+            <canvas id="sphere-canvas"></canvas>
+            
+            <!-- Status Overlay -->
+            <div class="status-overlay">
+                <h1 class="jarvis-title">J A R V I S</h1>
+                <div class="status-indicator">
+                    <span class="status-dot" id="status-dot"></span>
+                    <span class="status-text" id="status-text">ONLINE</span>
+                </div>
+                <p class="status-subtitle" id="status-subtitle">How can I help?</p>
+            </div>
+        </div>
+
+        <!-- Conversation Area -->
+        <div id="conversation-area" class="conversation-area">
+            <div id="messages-container" class="messages-container">
+                <!-- Messages will be inserted here -->
+            </div>
+            
+            <!-- Recommendations Area -->
+            <div id="recommendations-area" class="recommendations-area hidden">
+                <div class="ai-overview">
+                    <h3>AI OVERVIEW</h3>
+                    <p id="ai-overview-text"></p>
+                </div>
+                <div id="recommendations-grid" class="recommendations-grid">
+                    <!-- Recommendation cards will be inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Controls -->
+        <div class="input-controls">
+            <!-- Quick Actions -->
+            <div class="quick-actions" id="quick-actions">
+                <button class="quick-action-btn" data-action="explain">Explain</button>
+                <button class="quick-action-btn" data-action="code">Code</button>
+                <button class="quick-action-btn" data-action="summarize">Summarize</button>
+                <button class="quick-action-btn" data-action="recommend">Recommend</button>
+            </div>
+
+            <!-- Input Bar -->
+            <div class="input-bar">
+                <button id="mic-btn" class="mic-btn" aria-label="Voice input">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                    </svg>
+                </button>
+                
+                <div class="input-wrapper">
+                    <textarea 
+                        id="message-input" 
+                        placeholder="Ask JARVIS anything..." 
+                        rows="1"
+                        aria-label="Message input"
+                    ></textarea>
+                    <button id="send-btn" class="send-btn" aria-label="Send message">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <button id="stop-btn" class="stop-btn hidden" aria-label="Stop generation">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="6" y="6" width="12" height="12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Settings Panel -->
+        <button id="settings-toggle" class="settings-toggle" aria-label="Settings">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+            </svg>
+        </button>
+
+        <div id="settings-panel" class="settings-panel hidden">
+            <div class="settings-header">
+                <h2>SETTINGS</h2>
+                <button id="settings-close" class="settings-close">&times;</button>
+            </div>
+            
+            <div class="settings-content">
+                <!-- AI Settings -->
+                <div class="settings-section">
+                    <h3>AI Configuration</h3>
+                    <div class="setting-item">
+                        <label for="model-select">Model</label>
+                        <select id="model-select">
+                            <option value="google/gemma-3-27b-it:free" selected>Gemma 3 27B (Free)</option>
+                            <option value="google/gemma-2-9b-it:free">Gemma 2 9B (Free)</option>
+                            <option value="meta-llama/llama-3-8b-instruct:free">Llama 3 8B (Free)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Voice Settings -->
+                <div class="settings-section">
+                    <h3>Voice</h3>
+                    <div class="setting-item">
+                        <label for="voice-enabled">Enable Voice Output</label>
+                        <input type="checkbox" id="voice-enabled" checked>
+                    </div>
+                    <div class="setting-item">
+                        <label for="auto-speak">Auto Speak Responses</label>
+                        <input type="checkbox" id="auto-speak" checked>
+                    </div>
+                    <div class="setting-item">
+                        <label for="speech-speed">Speech Speed: <span id="speed-value">1.0x</span></label>
+                        <input type="range" id="speech-speed" min="0.7" max="1.5" step="0.1" value="1.0">
+                    </div>
+                </div>
+
+                <!-- Speech Recognition -->
+                <div class="settings-section">
+                    <h3>Speech Recognition</h3>
+                    <div class="setting-item">
+                        <label for="language-select">Language</label>
+                        <select id="language-select">
+                            <option value="en-US">English (US)</option>
+                            <option value="en-GB">English (UK)</option>
+                            <option value="es-ES">Spanish</option>
+                            <option value="fr-FR">French</option>
+                            <option value="de-DE">German</option>
+                            <option value="it-IT">Italian</option>
+                            <option value="pt-BR">Portuguese (BR)</option>
+                            <option value="ru-RU">Russian</option>
+                            <option value="ja-JP">Japanese</option>
+                            <option value="zh-CN">Chinese (Simplified)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Visual Settings -->
+                <div class="settings-section">
+                    <h3>Visual</h3>
+                    <div class="setting-item">
+                        <label for="performance-mode">Performance Mode</label>
+                        <select id="performance-mode">
+                            <option value="high">High Quality</option>
+                            <option value="balanced" selected>Balanced</option>
+                            <option value="low">Low Power</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="reduced-motion">Reduced Motion</label>
+                        <input type="checkbox" id="reduced-motion">
+                    </div>
+                </div>
+
+                <!-- Conversation -->
+                <div class="settings-section">
+                    <h3>Conversation</h3>
+                    <div class="setting-item">
+                        <label for="save-history">Save History Locally</label>
+                        <input type="checkbox" id="save-history" checked>
+                    </div>
+                    <button id="clear-history-btn" class="settings-btn">Clear Conversation History</button>
+                </div>
+
+                <!-- Connection Status -->
+                <div class="settings-section">
+                    <h3>Connection</h3>
+                    <div class="connection-status" id="connection-status">
+                        <span class="status-dot"></span>
+                        <span id="connection-text">Checking...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Notification -->
+        <div id="error-notification" class="error-notification hidden">
+            <div class="error-content">
+                <span class="error-icon">⚠️</span>
+                <span class="error-message" id="error-message"></span>
+                <button class="error-dismiss" id="error-dismiss">&times;</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="three.min.js"></script>
+    <script src="sphere.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
